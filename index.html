@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>loft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#f6f3eb;
+    --cream-deep:#efe9db;
+    --dark:#231f20;
+    --brown:#6f4f38;
+    --tan:#eab881;
+    --accent:#d59761;
+    --accent-dark:#c17f47;
+    --red:#f04c23;
+    --orange:#e2954a;
+    --yellow:#d0c93a;
+    --yellowgreen:#c3d94f;
+    --green:#7fae35;
+    --green-text:#5c8c2e;
+    --blue-note:#c4e8ef;
+    --pink-note:#f0c8df;
+    --green-note:#d9eac5;
+    --muted:#8a8580;
+    --line:#e2dccb;
+    --shadow: 0 8px 24px rgba(111,79,56,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: #e9e2d0;
+    font-family:'Inter',sans-serif;
+    color:var(--dark);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+  }
+  #phone{
+    width:100%;
+    max-width:430px;
+    height:100vh; /* Changed to strictly adhere to screen size */
+    max-height:100vh;
+    background:var(--cream);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  @media(min-width:431px){
+    body{ padding:24px 0; }
+    #phone{ height:850px; max-height:850px; border-radius:36px; border:1px solid #d8d0ba; }
+  }
+
+  /* ---------- HEADER ---------- */
+  #app-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 20px 14px 20px;
+    background:var(--cream);
+    box-shadow: 0 4px 10px rgba(111,79,56,0.08);
+    position:relative;
+    z-index:5;
+  }
+  .logo{ display:flex; align-items:center; gap:8px; cursor:pointer; background:none; border:none;}
+  .logo svg{ width:34px; height:34px; }
+  .logo span{
+    font-family:'Montserrat',sans-serif;
+    font-weight:800;
+    font-size:22px;
+    color:var(--brown);
+    letter-spacing:-0.5px;
+  }
+  .header-icons{ display:flex; gap:14px; align-items:center; }
+  .icon-btn{
+    background:none; border:none; cursor:pointer; padding:4px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--dark);
+    border-radius:50%;
+    transition:background .15s;
+  }
+  .icon-btn:hover{ background:rgba(111,79,56,0.08); }
+  .icon-btn svg{ width:26px; height:26px; }
+  .icon-btn svg path{ fill:var(--dark); }
+
+  /* ---------- MAIN CONTENT ---------- */
+  #app-content{
+    flex:1;
+    overflow-y:auto; /* Allows just the content to scroll */
+    padding:22px 20px 100px 20px;
+  }
+  .page{ display:none; animation: fadein .25s ease; }
+  .page.active{ display:block; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  h1.page-title, h2.section-title {
+    font-family:'Montserrat',sans-serif;
+    font-weight:800;
+    font-size:24px; /* Synchronized heading sizes */
+    color:var(--dark);
+    letter-spacing:-0.3px;
+  }
+  h1.page-title{ margin:0 0 14px 0; }
+  h2.section-title{ margin:30px 0 12px 0; }
+  h2.section-title:first-child{ margin-top:0; }
+
+  /* status card */
+  .status-card{
+    background:var(--accent);
+    border-radius:16px;
+    padding:20px 20px;
+    color:#3c2a17;
+  }
+  .status-card .status-headline{
+    font-weight:700;
+    font-size:19px;
+    margin:0 0 10px 0;
+  }
+  .status-card p{ margin:6px 0; font-size:15px; line-height:1.4; }
+
+  /* quick actions */
+  .quick-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+  }
+  .qa-btn{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 4px 10px 4px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:0 2px 6px rgba(111,79,56,0.06);
+    transition:transform .12s, box-shadow .12s;
+    font-family:'Inter',sans-serif;
+  }
+  .qa-btn:active{ transform:scale(.96); }
+  .qa-btn:hover{ box-shadow:0 4px 12px rgba(111,79,56,0.14); }
+  .qa-btn svg{ width:28px; height:28px; }
+  .qa-btn svg path, .qa-btn svg polygon{ fill:var(--brown); }
+  .qa-btn span{ font-size:12.5px; text-align:center; line-height:1.2; color:var(--dark); }
+
+  /* list card (upcoming chores etc) */
+  .list-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .list-row{
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .list-row:last-child{ border-bottom:none; }
+  .list-row .lr-main strong{ display:block; font-weight:600; }
+  .lr-badge{
+    font-size:12px; font-weight:600; padding:3px 9px; border-radius:20px; white-space:nowrap;
+  }
+  .badge-turn{ background:#fdecd2; color:var(--accent-dark); }
+  .badge-mine{ background:#e7f1d8; color:var(--green-text); }
+
+  /* generic table */
+  table.data-table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  /* Modifer for tables seamlessly connecting to a block below */
+  table.data-table.connected-bottom {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+  
+  table.data-table thead th{
+    background:var(--accent);
+    color:#3c2a17;
+    text-align:left;
+    padding:11px 14px;
+    font-size:13.5px;
+    font-weight:600;
+  }
+  table.data-table tbody td{
+    padding:12px 14px;
+    font-size:14.5px;
+    border-bottom:1px solid var(--line);
+  }
+  table.data-table tbody tr:last-child td{ border-bottom:none; }
+  table.data-table tbody tr.clickable{ cursor:pointer; }
+  table.data-table tbody tr.clickable:hover{ background:#faf7ef; }
+
+  .stock-bar-wrap{ display:flex; align-items:center; gap:8px; }
+  .stock-bar-track{
+    width:90px; height:12px; background:#eee6d6; border:1px solid #d8cfb8; border-radius:3px; overflow:hidden;
+  }
+  .stock-bar-fill{ height:100%; border-radius:2px 0 0 2px; }
+
+  .btn-row{ display:flex; gap:8px; padding:12px 14px; flex-wrap:wrap; background:#fff; border:1px solid var(--line); }
+  .btn-row.top-round{ border-radius: 0 0 14px 14px; border-top:none; }
+  .mini-btn{
+    background:#f4f0e4;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:7px 13px;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--dark);
+    font-family:'Inter',sans-serif;
+    transition:background .15s;
+  }
+  .mini-btn:hover{ background:#ece5d2; }
+  .mini-btn.primary{ background:var(--brown); color:#fff; border-color:var(--brown); }
+  .mini-btn.primary:hover{ background:#5c3f2c; }
+  .mini-btn.push-right{ margin-left:auto; }
+
+  .tab-toggle{
+    display:flex; gap:22px; border-bottom:1px solid var(--line); margin-bottom:0;
+  }
+  .tab-toggle button{
+    background:none; border:none; font-family:'Montserrat',sans-serif; font-weight:700; font-size:15px;
+    padding:8px 2px 10px 2px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent;
+  }
+  .tab-toggle button.active{ color:var(--dark); border-bottom:2px solid var(--accent); }
+  .tab-panel-space{ margin-top:14px; }
+
+  .amount-pos{ color:var(--green-text); font-weight:700; }
+  .amount-neg{ color:var(--red); font-weight:700; }
+  .status-paid{ color:var(--green-text); font-weight:600; font-size:13px; }
+  .status-unpaid{ color:var(--red); font-weight:600; font-size:13px; cursor:pointer; text-decoration:underline dotted; }
+
+  .bill-card{ border:1px solid var(--line); border-radius:14px; overflow:hidden; background:#fff; margin-bottom:16px;}
+  .bill-header{
+    background:var(--accent); color:#3c2a17; padding:11px 16px; font-weight:600; font-size:14.5px;
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer;
+  }
+  .bill-header .chev{ transition: transform .2s; }
+  .bill-card.collapsed .bill-body{ display:none; }
+  .bill-card.collapsed .chev{ transform: rotate(-90deg); }
+  .bill-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px;
+  }
+  .bill-row:last-child{ border-bottom:none; }
+
+  /* connect page */
+  .chat-card{
+    background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px;
+    display:flex; gap:14px; align-items:flex-start; cursor:pointer;
+  }
+  .avatar-stack{ position:relative; width:56px; height:52px; flex-shrink:0; }
+  .avatar{
+    position:absolute; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:#fff; border:2px solid #fff;
+  }
+  .chat-meta{ display:flex; justify-content:space-between; gap:8px; }
+  .chat-meta strong{ font-size:15px; }
+  .chat-meta .day{ font-size:12.5px; color:var(--muted); white-space:nowrap; }
+  .chat-preview{ font-size:14px; color:#555; margin-top:4px; }
+
+  .corkboard{
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 6px),
+      linear-gradient(160deg,#c99a63,#b9834e);
+    border:10px solid #8a5f39;
+    border-radius:10px;
+    padding:16px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .sticky{
+    border-radius:4px;
+    padding:12px 12px 10px 12px;
+    position:relative;
+    box-shadow:0 4px 8px rgba(0,0,0,0.18);
+    font-size:12.5px;
+  }
+  .sticky .pin{
+    width:10px; height:10px; border-radius:50%; background:#c0392b; position:absolute; top:6px; left:50%;
+    transform:translateX(-50%); box-shadow:0 1px 2px rgba(0,0,0,0.4);
+    z-index: 2;
+  }
+  .sticky h4{ margin:6px 0 6px 0; font-size:13px; font-family:'Montserrat',sans-serif; font-weight:800;}
+  .sticky p{ margin:0 0 6px 0; line-height:1.3; }
+  .sticky .meta{ font-size:11px; color:#555; opacity:.75; }
+  
+  /* Adjusted wide note format for the community bulletin */
+  .sticky.wide{ grid-column:span 2; display:flex; flex-direction:column; gap:8px; padding-top:16px; }
+  .sticky.wide img{ width:100%; height:auto; max-height:220px; object-fit:cover; border-radius:6px; flex-shrink:0; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  .sticky.blue{ background:var(--blue-note); }
+  .sticky.green{ background:var(--green-note); }
+  .sticky.pink{ background:var(--pink-note); }
+  .corkboard-footer{ grid-column:span 2; text-align:right; margin-top:4px; }
+  .corkboard-footer button{
+    background:var(--cream); border:none; border-radius:20px; padding:8px 16px; font-weight:600; font-size:13px;
+    cursor:pointer; font-family:'Inter',sans-serif;
+  }
+
+  .manage-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  }
+  .manage-btn{
+    background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 6px 14px 6px;
+    display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .manage-btn svg{ width:30px; height:30px; }
+  .manage-btn svg path, .manage-btn svg polygon{ fill:var(--dark); }
+  .manage-btn span{ font-size:12.5px; text-align:center; line-height:1.25; font-weight:500; }
+  .manage-btn:hover{ box-shadow:0 4px 12px rgba(111,79,56,0.12); }
+
+  /* ---------- BOTTOM NAV ---------- */
+  #bottom-nav{
+    display:flex;
+    background:var(--cream);
+    border-top:1px solid var(--line);
+    box-shadow: 0 -4px 10px rgba(111,79,56,0.06);
+    position:sticky;
+    bottom:0;
+    z-index:10;
+  }
+  .nav-btn{
+    flex:1; background:none; border:none; padding:10px 4px 12px 4px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:var(--dark); font-family:'Inter',sans-serif;
+  }
+  .nav-btn svg{ width:24px; height:24px; }
+  .nav-btn svg path, .nav-btn svg rect, .nav-btn svg polygon, .nav-btn svg line, .nav-btn svg circle, .nav-btn svg polyline{ stroke:var(--dark); transition:stroke .15s; }
+  .nav-btn span{ font-size:11.5px; font-weight:600; }
+  .nav-btn.active{ color:var(--accent); }
+  .nav-btn.active svg path, .nav-btn.active svg rect, .nav-btn.active svg polygon, .nav-btn.active svg line, .nav-btn.active svg circle, .nav-btn.active svg polyline{ stroke:var(--accent); }
+
+  /* ---------- MODAL ---------- */
+  #modal-overlay{
+    position:absolute; inset:0; background:rgba(35,31,32,0.42); display:none;
+    align-items:flex-end; justify-content:center; z-index:50;
+  }
+  #modal-overlay.open{ display:flex; }
+  .modal-sheet{
+    background:var(--cream); width:100%; max-width:430px; border-radius:20px 20px 0 0;
+    padding:22px 22px 26px 22px; animation:slideup .22s ease;
+    max-height:85%; overflow-y:auto;
+  }
+  @keyframes slideup{ from{ transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+  .modal-sheet h3{
+    font-family:'Montserrat',sans-serif; font-weight:800; font-size:19px; margin:0 0 16px 0;
+  }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:5px; color:var(--brown); }
+  .field input, .field select, .field textarea{
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+    font-family:'Inter',sans-serif; font-size:14.5px; background:#fff; color:var(--dark);
+  }
+  .field textarea{ resize:vertical; min-height:60px; }
+  .modal-actions{ display:flex; gap:10px; margin-top:18px; }
+  .modal-actions .mini-btn{ flex:1; text-align:center; padding:11px; font-size:14px; }
+  .color-swatches{ display:flex; gap:10px; }
+  .color-swatches div{
+    width:34px; height:34px; border-radius:50%; cursor:pointer; border:2px solid transparent;
+  }
+  .color-swatches div.selected{ border-color:var(--dark); }
+
+  #toast{
+    position:absolute; bottom:96px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--dark); color:#fff; padding:10px 18px; border-radius:24px; font-size:13.5px;
+    opacity:0; pointer-events:none; transition:all .25s; z-index:60; white-space:nowrap;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  ::-webkit-scrollbar{ width:0; height:0; }
+</style>
+</head>
+<body>
+
+<div id="phone">
+
+  <div id="app-header">
+    <button class="logo" onclick="goPage('home')" aria-label="loft home">
+      <svg viewBox="1471.48 131.76 117.60 100.11" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1511.37,204.51l-9.2,21.14c-1.55,1.41-3.07,2.23-4.93,2.22-1.93-.01-3.41-1.07-4.84-2.54l-15.59-16.05c-2.37-2.44-1.29-6.38,1.05-8.51l5.52-5.02c1.79-1.62,2.66-3.39,2.67-5.87l.04-17.92c0-1.63,1.35-3.92,2.54-5.11l29.82-29.77c2.26-2.26,6.38-1.32,8.15.6,2.1,2.27,2.49,6,.07,8.43l-23.29,23.39v19.59c0,1.7.91,2.92,2.41,3.25l5.57,12.18Z" fill="#6f4f38"/>
+        <path d="M1505.76,192.33h15.76c3.56.02,5.6,3.66,5.35,6.61-.29,3.41-3.03,5.55-6.54,5.56h-8.96s-5.61-12.17-5.61-12.17Z" fill="#6f4f38"/>
+        <path d="M1549.19,204.51l9.2,21.14c1.55,1.41,3.07,2.23,4.93,2.22s3.41-1.07,4.84-2.54l15.59-16.05c2.37-2.44,1.29-6.38-1.05-8.51l-5.52-5.02c-1.79-1.62-2.66-3.39-2.67-5.87l-.04-17.92c0-1.63-1.35-3.92-2.54-5.11l-29.82-29.77c-2.26-2.26-6.38-1.32-8.15.6-2.1,2.27-2.49,6-.07,8.43l23.29,23.39v19.59c0,1.7-.91,2.92-2.41,3.25l-5.57,12.18Z" fill="#6f4f38"/>
+        <path d="M1554.8,192.33h-15.76c-3.56.02-5.6,3.66-5.35,6.61.29,3.41,3.03,5.55,6.54,5.56h8.96s5.61-12.17,5.61-12.17Z" fill="#6f4f38"/>
+      </svg>
+      <span>loft</span>
+    </button>
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Profile" onclick="openProfile()">
+        <svg viewBox="1891.86 153.37 79.64 79.64" xmlns="http://www.w3.org/2000/svg"><path d="M1909.65,211.45c3.05-2.33,6.45-4.16,10.21-5.51,3.76-1.34,7.7-2.02,11.82-2.02s8.06.67,11.82,2.02c3.76,1.34,7.16,3.18,10.21,5.51,2.09-2.45,3.72-5.22,4.88-8.33,1.16-3.1,1.75-6.42,1.75-9.94,0-7.94-2.79-14.7-8.37-20.29-5.58-5.58-12.34-8.37-20.29-8.37s-14.7,2.79-20.29,8.37c-5.58,5.58-8.37,12.34-8.37,20.29,0,3.52.58,6.84,1.75,9.94,1.16,3.1,2.79,5.88,4.88,8.33ZM1922.77,193.14c-2.42-2.42-3.63-5.39-3.63-8.91s1.21-6.49,3.63-8.91c2.42-2.42,5.39-3.63,8.91-3.63s6.49,1.21,8.91,3.63,3.63,5.39,3.63,8.91-1.21,6.49-3.63,8.91c-2.42,2.42-5.39,3.63-8.91,3.63s-6.49-1.21-8.91-3.63ZM1931.68,229.01c-4.96,0-9.61-.94-13.97-2.82-4.36-1.88-8.15-4.43-11.37-7.66-3.22-3.22-5.78-7.02-7.66-11.37s-2.82-9.02-2.82-13.97.94-9.61,2.82-13.97c1.88-4.36,4.43-8.15,7.66-11.37,3.22-3.22,7.02-5.78,11.37-7.66,4.36-1.88,9.02-2.82,13.97-2.82s9.61.94,13.97,2.82c4.36,1.88,8.15,4.43,11.37,7.66,3.22,3.22,5.78,7.02,7.66,11.37,1.88,4.36,2.82,9.02,2.82,13.97s-.94,9.61-2.82,13.97c-1.88,4.36-4.43,8.15-7.66,11.37-3.22,3.22-7.02,5.78-11.37,7.66-4.36,1.88-9.02,2.82-13.97,2.82ZM1940.63,220.45c2.81-.93,5.37-2.25,7.7-3.99-2.33-1.73-4.9-3.06-7.7-3.99-2.81-.93-5.79-1.39-8.96-1.39s-6.15.46-8.96,1.39c-2.81.93-5.37,2.25-7.7,3.99,2.33,1.73,4.9,3.06,7.7,3.99,2.81.93,5.79,1.39,8.96,1.39s6.15-.46,8.96-1.39ZM1935.53,188.08c1.02-1.02,1.52-2.3,1.52-3.85s-.51-2.84-1.52-3.85c-1.02-1.02-2.3-1.52-3.85-1.52s-2.84.51-3.85,1.52c-1.02,1.02-1.52,2.3-1.52,3.85s.51,2.84,1.52,3.85c1.02,1.02,2.3,1.52,3.85,1.52s2.84-.51,3.85-1.52Z" fill="#333"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Settings" onclick="openSettings()">
+        <svg viewBox="2002.12 150.46 85.81 85.43" xmlns="http://www.w3.org/2000/svg"><path d="M2034.38,231.89l-1.55-12.39c-.84-.32-1.63-.71-2.37-1.16-.74-.45-1.47-.94-2.18-1.45l-11.52,4.84-10.64-18.39,9.97-7.55c-.06-.45-.1-.89-.1-1.31v-2.61c0-.42.03-.85.1-1.31l-9.97-7.55,10.64-18.39,11.52,4.84c.71-.52,1.45-1,2.23-1.45.77-.45,1.55-.84,2.32-1.16l1.55-12.39h21.29l1.55,12.39c.84.32,1.63.71,2.37,1.16.74.45,1.47.94,2.18,1.45l11.52-4.84,10.64,18.39-9.97,7.55c.06.45.1.89.1,1.31v2.61c0,.42-.06.85-.19,1.31l9.97,7.55-10.64,18.39-11.42-4.84c-.71.52-1.45,1-2.23,1.45-.77.45-1.55.84-2.32,1.16l-1.55,12.39h-21.29ZM2041.16,224.15h7.64l1.35-10.26c2-.52,3.85-1.27,5.56-2.27,1.71-1,3.27-2.21,4.69-3.63l9.58,3.97,3.77-6.58-8.32-6.29c.32-.9.55-1.85.68-2.85s.19-2.02.19-3.05-.06-2.05-.19-3.05c-.13-1-.35-1.95-.68-2.85l8.32-6.29-3.77-6.58-9.58,4.06c-1.42-1.48-2.98-2.73-4.69-3.73s-3.56-1.76-5.56-2.27l-1.26-10.26h-7.64l-1.35,10.26c-2,.52-3.85,1.27-5.56,2.27s-3.27,2.21-4.69,3.63l-9.58-3.97-3.77,6.58,8.32,6.19c-.32.97-.55,1.94-.68,2.9s-.19,2-.19,3.1c0,1.03.06,2.03.19,3s.35,1.94.68,2.9l-8.32,6.29,3.77,6.58,9.58-4.06c1.42,1.48,2.98,2.73,4.69,3.73,1.71,1,3.56,1.76,5.56,2.27l1.26,10.26ZM2045.22,206.73c3.74,0,6.93-1.32,9.58-3.97,2.64-2.64,3.97-5.84,3.97-9.58s-1.32-6.93-3.97-9.58c-2.64-2.64-5.84-3.97-9.58-3.97s-7.02,1.32-9.63,3.97c-2.61,2.64-3.92,5.84-3.92,9.58s1.31,6.93,3.92,9.58c2.61,2.64,5.82,3.97,9.63,3.97Z" fill="#333"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="app-content">
+
+    <!-- ============= HOME PAGE ============= -->
+    <section class="page" id="page-home">
+      <h1 class="page-title">Good Morning, <span id="home-username">Fergus</span></h1>
+
+      <div class="status-card">
+        <p class="status-headline" id="status-headline">All caught up!</p>
+        <p id="status-line1">No chores due today.</p>
+        <p id="status-line2">You are owed $14 from Leo</p>
+        <p>The house is running smoothly</p>
+      </div>
+
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-grid">
+        <button class="qa-btn" onclick="openModal('expense')">
+          <svg viewBox="2753.45 859.36 74.28 101.02" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2764.17,904.37c-2.76-3.23-4.14-7.17-4.14-11.81,0-5.6,1.81-9.95,5.43-13.05,3.62-3.11,7.31-4.86,11.11-5.29v-10.86h10.33v10.86c4.31.68,7.86,2.26,10.66,4.72,2.8,2.45,4.85,5.44,6.13,8.98l-9.56,4.13c-1.03-2.76-2.49-4.82-4.39-6.2-1.89-1.37-4.48-2.06-7.75-2.06-3.79,0-6.68.84-8.65,2.52-1.98,1.68-2.97,3.76-2.97,6.27,0,2.83,1.29,5.08,3.87,6.71,2.58,1.64,7.06,3.37,13.45,5.17,2.12.61,4.06,1.36,5.8,2.23l-8.14,8.14c-1.71-.68-3.7-1.37-5.94-2.11-7.4-2.32-12.48-5.1-15.24-8.33Z"/>
+            <path d="M2786.27,935.41l8.03,8.03c-2.24,1-4.7,1.69-7.39,2.09v10.85h-10.33v-11.11c-4.57-1.03-8.51-3.02-11.83-5.94-3.32-2.94-5.75-7.06-7.3-12.4l9.56-3.88c1.29,4.14,3.21,7.28,5.75,9.43,2.55,2.15,5.88,3.23,10.02,3.23,1.24,0,2.39-.1,3.49-.29Z"/>
+            <path d="M2801.28,938.66v-9.75h-6.26c.27-.92.41-1.93.41-3.03,0-2.37-.58-4.35-1.76-5.95h7.61v-7.17c2.99,3.71,4.49,8,4.49,12.86,0,5.56-1.5,9.9-4.49,13.04Z"/>
+            <polygon points="2823.73 919.94 2823.73 928.91 2810.26 928.91 2810.26 942.38 2801.28 942.38 2801.28 928.91 2787.8 928.91 2787.8 919.94 2801.28 919.94 2801.28 906.46 2810.26 906.46 2810.26 919.94 2823.73 919.94"/>
+          </svg>
+          <span>Add<br>Expense</span>
+        </button>
+        <button class="qa-btn" onclick="openModal('grocery')">
+          <svg viewBox="2899.31 859.34 100.16 101.50" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2947.84,898.96v-13.36h-13.36v-8.9h13.36v-13.36h8.9v13.36h13.36v8.9h-13.36v13.36h-8.9ZM2923.74,954.22c-1.74-1.74-2.62-3.84-2.62-6.29s.87-4.54,2.62-6.29c1.74-1.74,3.84-2.62,6.29-2.62s4.54.87,6.29,2.62,2.62,3.84,2.62,6.29-.87,4.54-2.62,6.29-3.84,2.62-6.29,2.62-4.54-.87-6.29-2.62ZM2968.26,954.22c-1.74-1.74-2.62-3.84-2.62-6.29s.87-4.54,2.62-6.29c1.74-1.74,3.84-2.62,6.29-2.62s4.54.87,6.29,2.62c1.74,1.74,2.62,3.84,2.62,6.29s-.87,4.54-2.62,6.29c-1.74,1.74-3.84,2.62-6.29,2.62s-4.54-.87-6.29-2.62ZM2903.32,876.71v-8.9h14.58l18.92,40.07h31.16l17.36-31.16h10.13l-19.59,35.39c-.82,1.48-1.91,2.63-3.28,3.45-1.37.82-2.88,1.22-4.51,1.22h-33.17l-4.9,8.9h53.42v8.9h-53.42c-3.34,0-5.88-1.45-7.62-4.34-1.74-2.89-1.8-5.82-.17-8.79l6.01-10.91-16.03-33.83h-8.9Z"/>
+          </svg>
+          <span>Add<br>Grocery</span>
+        </button>
+        <button class="qa-btn" onclick="openModal('chore')">
+          <svg viewBox="3060.19 860.20 110.83 101.49" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3110.93,957.68c-6.47,0-12.54-1.23-18.23-3.68-5.69-2.45-10.63-5.78-14.84-9.99-4.21-4.21-7.54-9.15-9.99-14.84-2.45-5.69-3.68-11.76-3.68-18.23s1.23-12.54,3.68-18.23c2.45-5.69,5.78-10.63,9.99-14.84,4.21-4.21,9.15-7.54,14.84-9.99,5.69-2.45,11.76-3.68,18.23-3.68,5.06,0,9.86.74,14.37,2.22,4.52,1.48,8.69,3.54,12.5,6.19l-6.78,6.89c-2.96-1.87-6.12-3.33-9.47-4.38-3.35-1.05-6.89-1.58-10.63-1.58-10.36,0-19.18,3.64-26.47,10.93-7.28,7.28-10.93,16.11-10.93,26.47s3.64,19.18,10.93,26.47c7.28,7.28,16.11,10.93,26.47,10.93,2.49,0,4.91-.23,7.25-.7,2.34-.47,4.6-1.13,6.78-1.99l7.01,7.13c-3.19,1.56-6.54,2.77-10.05,3.62-3.51.86-7.17,1.29-10.98,1.29ZM3143.65,948.33v-14.02h-14.02v-9.35h14.02v-14.02h9.35v14.02h14.02v9.35h-14.02v14.02h-9.35ZM3104.39,932.44l-19.87-19.87,6.54-6.54,13.32,13.32,46.74-46.86,6.54,6.54-53.29,53.41Z"/>
+          </svg>
+          <span>Add<br>Chore</span>
+        </button>
+        <button class="qa-btn" onclick="openModal('date')">
+          <svg viewBox="3238.74 863.80 96.81 101.49" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3308.18,961.29v-14.02h-14.02v-9.35h14.02v-14.02h9.35v14.02h14.02v9.35h-14.02v14.02h-9.35ZM3252.09,951.94c-2.57,0-4.77-.92-6.6-2.75-1.83-1.83-2.75-4.03-2.75-6.6v-56.09c0-2.57.92-4.77,2.75-6.6,1.83-1.83,4.03-2.75,6.6-2.75h4.67v-9.35h9.35v9.35h28.05v-9.35h9.35v9.35h4.67c2.57,0,4.77.92,6.6,2.75,1.83,1.83,2.75,4.03,2.75,6.6v28.51c-1.56-.23-3.12-.35-4.67-.35s-3.12.12-4.67.35v-9.82h-56.09v37.4h32.72c0,1.56.12,3.12.35,4.67.23,1.56.66,3.12,1.29,4.67h-34.36ZM3252.09,895.85h56.09v-9.35h-56.09v9.35ZM3252.09,895.85v-9.35,9.35Z"/>
+          </svg>
+          <span>Add<br>Date</span>
+        </button>
+      </div>
+
+      <h2 class="section-title">Upcoming Chores</h2>
+      <div class="list-card" id="upcoming-chores-list"></div>
+    </section>
+
+    <!-- ============= HUB PAGE ============= -->
+    <section class="page" id="page-hub">
+      <h1 class="page-title">Shared Amenities</h1>
+      <!-- Modified with .connected-bottom to properly join with button row below -->
+      <table class="data-table connected-bottom">
+        <thead><tr><th>Item</th><th>Stock</th><th>Last Restock</th></tr></thead>
+        <tbody id="amenities-body"></tbody>
+      </table>
+      <div class="btn-row top-round">
+        <button class="mini-btn primary" onclick="openModal('amenity')">Add New</button>
+        <button class="mini-btn" onclick="openModal('updateLevel')">Update Level</button>
+        <button class="mini-btn" onclick="openModal('assignAmenity')">Assign Item To Me</button>
+      </div>
+
+      <h2 class="section-title">To Do List</h2>
+      <div class="tab-toggle">
+        <button id="taskTabOpen" class="active" onclick="setTaskTab('open')">Open Tasks</button>
+        <button id="taskTabMine" onclick="setTaskTab('mine')">My Tasks</button>
+      </div>
+      <div class="tab-panel-space">
+        <!-- Modified with .connected-bottom to properly join with button row below -->
+        <table class="data-table connected-bottom">
+          <thead><tr><th>Tasks</th><th>Priority / Due</th></tr></thead>
+          <tbody id="tasks-body"></tbody>
+        </table>
+        <div class="btn-row top-round">
+          <button class="mini-btn primary" onclick="openModal('task')">Add New</button>
+          <button class="mini-btn" onclick="openModal('assignTask')">Assign Task To Me</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= FINANCE PAGE ============= -->
+    <section class="page" id="page-finance">
+      <h1 class="page-title">Monthly Spending</h1>
+      <!-- Modified with .connected-bottom to properly join with summary block below -->
+      <table class="data-table connected-bottom">
+        <thead><tr><th>Person</th><th>Amount</th><th>Average</th><th>Owed/Owes</th></tr></thead>
+        <tbody id="spending-body"></tbody>
+      </table>
+      <div style="background:#fff;border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;padding:12px 16px;font-size:13.5px;" id="spending-note"></div>
+
+      <h2 class="section-title">Shared Bills</h2>
+      <div id="bills-list"></div>
+    </section>
+
+    <!-- ============= CONNECT PAGE ============= -->
+    <section class="page" id="page-connect">
+      <h1 class="page-title">Home Group Chat</h1>
+      <div class="chat-card" onclick="openModal('chat')">
+        <div class="avatar-stack">
+          <div class="avatar" style="background:#8a8f98; left:0; top:16px;">F</div>
+          <div class="avatar" style="background:#b9bec5; left:14px; top:0;">S</div>
+          <div class="avatar" style="background:#6f7580; left:26px; top:16px;">L</div>
+        </div>
+        <div style="flex:1;">
+          <div class="chat-meta"><strong>You, Leo &amp; Sarah</strong><span class="day" id="chat-day">Thursday</span></div>
+          <div class="chat-preview" id="chat-preview-text">Is someone able to water the new plants on the balcony?</div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Community Bulletin Board</h2>
+      <div class="corkboard" id="corkboard"></div>
+
+      <h2 class="section-title">Manage The House</h2>
+      <div class="manage-grid">
+        <button class="manage-btn" onclick="openModal('vacancy')">
+          <svg viewBox="5249.62 1240.57 82.22 91.50" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5290.72,1244.57l-37.1,27.84v55.66h74.22v-55.66l-37.12-27.84ZM5318.55,1318.79h-55.66v-41.74l27.83-20.88,27.83,20.88v41.74Z"/>
+            <polygon points="5308.25 1286.56 5308.25 1295.33 5295.1 1295.33 5295.1 1308.47 5286.34 1308.47 5286.34 1295.33 5273.18 1295.33 5273.18 1286.56 5286.34 1286.56 5286.34 1273.41 5295.1 1273.41 5295.1 1286.56 5308.25 1286.56"/>
+          </svg>
+          <span>List A Vacancy</span>
+        </button>
+        <button class="manage-btn" onclick="openModal('roommate')">
+          <svg viewBox="5458.68 1248.49 114.35 85.34" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5539.27,1325.76v-14.84l-6.44,4.6c-2.46,1.76-5.15,3.12-8,4.03-2.84.91-5.86,1.38-8.97,1.38s-6-.48-8.88-1.43c-2.9-.95-5.62-2.33-8.09-4.1l-6.44-4.6v14.96h-25.69v-15.26c0-1.63.51-2.9,1.62-3.98,1.13-1.1,2.39-1.62,3.98-1.62h15.83c.92,0,1.77.23,2.62.7.87.48,1.54,1.11,2.06,1.91l.07.11.08.11c2.7,3.63,6.08,6.51,10.04,8.56,3.99,2.07,8.3,3.12,12.81,3.12s8.94-1.05,12.93-3.12c3.96-2.05,7.3-4.93,9.92-8.56.71-.92,1.51-1.63,2.44-2.16.79-.45,1.57-.67,2.39-.67h15.83c1.65,0,2.93.5,4.01,1.59,1.08,1.08,1.59,2.36,1.59,4.01v15.26h-25.69Z"/>
+            <path d="M5559.36,1308.97c.74,0,.91.17,1.13.39.22.22.39.39.39,1.13v11.19h-17.55v-12.67c.11-.05.17-.05.2-.05h15.83ZM5488.19,1308.97c.07,0,.13,0,.2.02v12.7h-17.55v-11.19c0-.65.13-.82.39-1.07.37-.36.6-.46,1.13-.46h15.83ZM5559.36,1300.82h-15.83c-1.53,0-3,.4-4.41,1.21-1.41.81-2.64,1.89-3.69,3.26-2.26,3.14-5.1,5.6-8.52,7.37-3.42,1.77-7.11,2.66-11.06,2.66s-7.51-.89-10.94-2.66c-3.42-1.77-6.3-4.23-8.64-7.37-.89-1.37-2.05-2.46-3.5-3.26s-2.98-1.21-4.59-1.21h-15.83c-2.66,0-4.93.93-6.83,2.78-1.89,1.85-2.84,4.15-2.84,6.89v19.34h33.84v-11.12c2.82,2.01,5.88,3.56,9.18,4.65,3.3,1.09,6.69,1.63,10.15,1.63s6.95-.52,10.21-1.57c3.26-1.05,6.3-2.58,9.12-4.59v11h33.84v-19.34c0-2.74-.93-5.04-2.78-6.89-1.85-1.85-4.15-2.78-6.89-2.78h0Z"/>
+            <path d="M5515.86,1294.47c3.28,0,6.79.45,10.49,1.34-.57.67-1.11,1.37-1.61,2.1-.99,1.44-2.2,2.5-3.7,3.25-1.61.8-3.3,1.19-5.18,1.19-1.76,0-3.39-.4-4.98-1.21-1.59-.82-2.9-1.92-4-3.37-.48-.69-.98-1.34-1.51-1.97,3.69-.89,7.21-1.34,10.48-1.34h0ZM5515.86,1286.32c-5.08,0-10.47.87-16.19,2.6-5.72,1.73-9.47,4.09-11.24,7.07,2.42,0,4.65.58,6.71,1.75,2.05,1.17,3.77,2.76,5.14,4.77,1.85,2.5,4.15,4.45,6.89,5.86,2.74,1.41,5.64,2.11,8.7,2.11s6.08-.68,8.82-2.05c2.74-1.37,5-3.34,6.77-5.92,1.37-2.01,3.1-3.61,5.2-4.77,2.09-1.17,4.31-1.75,6.65-1.75-1.77-2.98-5.52-5.34-11.24-7.07-5.72-1.73-11.12-2.6-16.19-2.6h0Z"/>
+            <path d="M5477.19,1275.13c1.96,0,3.32.53,4.58,1.78,1.25,1.25,1.78,2.62,1.78,4.58s-.55,3.26-1.83,4.56c-1.25,1.26-2.6,1.8-4.53,1.8s-3.22-.55-4.51-1.85c-1.29-1.29-1.84-2.64-1.84-4.51s.54-3.29,1.8-4.53c1.3-1.28,2.66-1.83,4.56-1.83h0ZM5477.19,1266.99c-4.03,0-7.45,1.39-10.27,4.17-2.82,2.78-4.23,6.22-4.23,10.33s1.41,7.45,4.23,10.27c2.82,2.82,6.24,4.23,10.27,4.23s7.55-1.41,10.33-4.23c2.78-2.82,4.17-6.24,4.17-10.27s-1.39-7.55-4.17-10.33c-2.78-2.78-6.22-4.17-10.33-4.17h0Z"/>
+            <path d="M5554.53,1275.13c1.96,0,3.32.53,4.58,1.78,1.25,1.25,1.78,2.62,1.78,4.58s-.55,3.26-1.83,4.56c-1.25,1.26-2.6,1.8-4.53,1.8s-3.22-.55-4.51-1.85c-1.29-1.29-1.84-2.64-1.84-4.51s.54-3.29,1.8-4.53c1.3-1.28,2.66-1.83,4.56-1.83h0ZM5554.53,1266.99c-4.03,0-7.45,1.39-10.27,4.17-2.82,2.78-4.23,6.22-4.23,10.33s1.41,7.45,4.23,10.27c2.82,2.82,6.24,4.23,10.27,4.23s7.55-1.41,10.33-4.23c2.78-2.82,4.17-6.24,4.17-10.27s-1.39-7.55-4.17-10.33c-2.78-2.78-6.22-4.17-10.33-4.17h0Z"/>
+            <path d="M5515.86,1260.63c1.96,0,3.32.53,4.58,1.78,1.25,1.25,1.78,2.62,1.78,4.58s-.55,3.26-1.83,4.56c-1.25,1.26-2.6,1.8-4.53,1.8s-3.22-.55-4.51-1.85c-1.29-1.29-1.84-2.64-1.84-4.51s.54-3.29,1.8-4.53c1.3-1.28,2.66-1.83,4.56-1.83h0ZM5515.86,1252.49c-4.03,0-7.45,1.39-10.27,4.17-2.82,2.78-4.23,6.22-4.23,10.33s1.41,7.45,4.23,10.27,6.24,4.23,10.27,4.23,7.55-1.41,10.33-4.23,4.17-6.24,4.17-10.27-1.39-7.55-4.17-10.33c-2.78-2.78-6.22-4.17-10.33-4.17h0Z"/>
+          </svg>
+          <span>Find A Roommate</span>
+        </button>
+        <button class="manage-btn" onclick="openModal('report')">
+          <svg viewBox="5701.33 1248.48 86.69 86.69" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5744.67,1313.69c1.24,0,2.28-.42,3.11-1.26.84-.84,1.26-1.88,1.26-3.11s-.42-2.28-1.26-3.11c-.84-.84-1.88-1.26-3.11-1.26s-2.28.42-3.11,1.26c-.84.84-1.26,1.88-1.26,3.11s.42,2.28,1.26,3.11c.84.84,1.88,1.26,3.11,1.26ZM5740.3,1296.2h8.74v-26.23h-8.74v26.23ZM5728.28,1331.17l-22.95-22.95v-32.79l22.95-22.95h32.79l22.95,22.95v32.79l-22.95,22.95h-32.79ZM5731.99,1322.43h25.35l17.92-17.92v-25.35l-17.92-17.92h-25.35l-17.92,17.92v25.35l17.92,17.92Z"/>
+          </svg>
+          <span>Report A Problem</span>
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="bottom-nav">
+    <button class="nav-btn active" data-page="home" onclick="goPage('home')">
+      <!-- House SVG Icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" data-page="hub" onclick="goPage('hub')">
+      <!-- Grid Dashboard SVG Icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <span>Hub</span>
+    </button>
+    <button class="nav-btn" data-page="finance" onclick="goPage('finance')">
+      <!-- Bank Institution SVG Icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 22 7"></polygon>
+        <line x1="4" y1="22" x2="20" y2="22"></line>
+        <line x1="12" y1="22" x2="12" y2="7"></line>
+        <line x1="6" y1="22" x2="6" y2="7"></line>
+        <line x1="18" y1="22" x2="18" y2="7"></line>
+      </svg>
+      <span>Finance</span>
+    </button>
+    <button class="nav-btn" data-page="connect" onclick="goPage('connect')">
+      <!-- Users Connect SVG Icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      <span>Connect</span>
+    </button>
+  </div>
+
+  <div id="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-sheet" id="modal-sheet"></div>
+  </div>
+
+  <div id="toast"></div>
+
+</div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const USER = "Fergus";
+const PEOPLE = ["Fergus","Leo","Sarah"];
+
+let state = null;
+
+function defaultState(){
+  return {
+    chores: [
+      {id:cid(), label:"Garbage Day", detail:"Tomorrow, 7:00 AM", person:"Fergus"},
+      {id:cid(), label:"Common Area Vacuum", detail:"In 3 Days", person:"Leo"},
+      {id:cid(), label:"Clean Bathroom", detail:"In 5 Days", person:"Sarah"},
+    ],
+    amenities: [
+      {id:cid(), name:"Toilet Paper", stock:12, person:"Leo", date:"10 Jul"},
+      {id:cid(), name:"Dish Soap", stock:30, person:"Fergus", date:"17 Jul"},
+      {id:cid(), name:"Olive Oil", stock:48, person:"Fergus", date:"4 Jul"},
+      {id:cid(), name:"Paper Towel", stock:66, person:"Sarah", date:"12 Jul"},
+      {id:cid(), name:"Coffee", stock:85, person:"Leo", date:"24 Jul"},
+    ],
+    tasks: [
+      {id:cid(), title:"Fix Dripping Tap", priority:"High", due:"Today", mine:false, done:false},
+      {id:cid(), title:"Deep Clean Oven", priority:"Med", due:"4 Aug", mine:false, done:false},
+      {id:cid(), title:"Take Out Recycling", priority:"Med", due:"Today", mine:true, done:false},
+      {id:cid(), title:"Vacuum", priority:"Low", due:"2 Aug", mine:false, done:false},
+      {id:cid(), title:"Water Plants", priority:"Low", due:"6 Aug", mine:true, done:false},
+    ],
+    spending: [
+      {person:"Leo", amount:64},
+      {person:"Fergus", amount:46},
+      {person:"Sarah", amount:59},
+    ],
+    bills: [
+      {id:cid(), name:"Water Bill", total:150, due:"3 Aug", collapsed:false,
+        splits:[
+          {person:"Leo", note:"is owed $8 so will pay", pay:42, status:"Unpaid"},
+          {person:"Fergus", note:"owes $8 so will pay", pay:58, status:"Paid"},
+          {person:"Sarah", note:"is owed $3 so will pay", pay:47, status:"Paid"},
+        ]},
+      {id:cid(), name:"Electricity", total:180, due:"14 Aug", collapsed:false,
+        splits:[
+          {person:"Sarah", note:"will pay", pay:60, status:"Unpaid"},
+          {person:"Fergus", note:"will pay", pay:60, status:"Unpaid"},
+          {person:"Leo", note:"will pay", pay:60, status:"Paid"},
+        ]},
+      {id:cid(), name:"Internet", total:null, due:"out on 30 Aug", collapsed:true, splits:[]},
+    ],
+    chat: {
+      day:"Thursday",
+      preview:"Is someone able to water the new plants on the balcony?",
+      messages:[
+        {from:"Sarah", text:"Is someone able to water the new plants on the balcony?"}
+      ]
+    },
+    posts: [
+      {id:cid(), color:"blue", title:"NEED WORK?", body:"Loft cafe is hiring!", author:"", time:"", wide:false, img:null},
+      {id:cid(), color:"green", title:"REMINDER", body:"Run club every sunday morning 7:00 am.", author:"Josh", time:"1 day ago", wide:false, img:null},
+      {id:cid(), color:"pink", title:"FREE COFFEE TABLE", body:"Unit 3 (2nd Floor)\nJust got a new one. Please come and take.", author:"Alex", time:"2 hrs ago", wide:true, img:"table"},
+    ],
+    taskTab: "open",
+  };
+}
+
+let cidCounter = 1;
+function cid(){ return 'id' + (cidCounter++) + '_' + Math.random().toString(36).slice(2,7); }
+
+/* ---------- persistence ---------- */
+async function loadState(){
+  try{
+    const res = await window.storage.get('loft-app-state', false);
+    if(res && res.value){
+      state = JSON.parse(res.value);
+      return;
+    }
+  }catch(e){ /* not found or unavailable */ }
+  state = defaultState();
+}
+let saveTimer=null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{ await window.storage.set('loft-app-state', JSON.stringify(state), false); }
+    catch(e){ /* storage unavailable, continue silently */ }
+  }, 250);
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
+  document.getElementById('app-content').scrollTop = 0;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function stockColor(pct){
+  if(pct < 20) return getCss('--red');
+  if(pct < 40) return getCss('--orange');
+  if(pct < 60) return getCss('--yellow');
+  if(pct < 80) return getCss('--yellowgreen');
+  return getCss('--green');
+}
+function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function priorityColor(p){
+  if(p==="High") return getCss('--red');
+  if(p==="Med") return getCss('--orange');
+  return getCss('--green-text');
+}
+
+function renderAll(){
+  renderHome();
+  renderHub();
+  renderFinance();
+  renderConnect();
+}
+
+function renderHome(){
+  document.getElementById('home-username').textContent = USER;
+
+  const dueToday = state.tasks.filter(t=>!t.done && t.due==="Today");
+  const totalOwed = computeOwedToUser();
+  const headline = document.getElementById('status-headline');
+  const line1 = document.getElementById('status-line1');
+  const line2 = document.getElementById('status-line2');
+
+  if(dueToday.length===0){
+    headline.textContent = "All caught up!";
+    line1.textContent = "No chores due today.";
+  } else {
+    headline.textContent = dueToday.length + " thing" + (dueToday.length>1?"s":"") + " need" + (dueToday.length>1?"":"s") + " your attention";
+    line1.textContent = dueToday.map(t=>t.title).join(", ") + " due today.";
+  }
+  if(totalOwed > 0){
+    line2.textContent = "You are owed $" + totalOwed + " from the house";
+  } else if(totalOwed < 0){
+    line2.textContent = "You owe $" + Math.abs(totalOwed) + " to the house";
+  } else {
+    line2.textContent = "All bills are settled";
+  }
+
+  const list = document.getElementById('upcoming-chores-list');
+  list.innerHTML = '';
+  state.chores.slice(0,6).forEach(c=>{
+    const row = document.createElement('div');
+    row.className = 'list-row';
+    const mine = c.person === USER;
+    row.innerHTML = `<div class="lr-main"><strong>${esc(c.label)}:</strong>${esc(c.detail)}${mine?' (Your Turn!)':' ('+esc(c.person)+')'}</div>`;
+    list.appendChild(row);
+  });
+  if(state.chores.length===0){
+    list.innerHTML = '<div class="list-row">No upcoming chores. Nice work!</div>';
+  }
+}
+
+function renderHub(){
+  const body = document.getElementById('amenities-body');
+  body.innerHTML = '';
+  state.amenities.forEach(a=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${esc(a.name)}</td>
+      <td><div class="stock-bar-wrap"><div class="stock-bar-track"><div class="stock-bar-fill" style="width:${a.stock}%; background:${stockColor(a.stock)}"></div></div></div></td>
+      <td>${esc(a.person)}, ${esc(a.date)}</td>`;
+    body.appendChild(tr);
+  });
+
+  const tbody = document.getElementById('tasks-body');
+  tbody.innerHTML = '';
+  const filtered = state.tasks.filter(t => !t.done && (state.taskTab==='open' ? true : t.mine));
+  if(filtered.length===0){
+    tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;color:var(--muted);">No tasks here.</td></tr>`;
+  }
+  filtered.forEach(t=>{
+    const tr = document.createElement('tr');
+    tr.className = 'clickable';
+    tr.title = 'Click to mark complete';
+    tr.innerHTML = `
+      <td>${esc(t.title)}${t.mine?' <span style="font-size:11px;color:var(--accent-dark);">(mine)</span>':''}</td>
+      <td style="color:${priorityColor(t.priority)};font-weight:600;">${t.priority} / ${esc(t.due)}</td>`;
+    tr.onclick = ()=>completeTask(t.id);
+    tbody.appendChild(tr);
+  });
+}
+
+function completeTask(id){
+  const t = state.tasks.find(x=>x.id===id);
+  if(t){ t.done = true; saveState(); renderHub(); renderHome(); showToast('Marked "'+t.title+'" as done'); }
+}
+
+function setTaskTab(tab){
+  state.taskTab = tab;
+  document.getElementById('taskTabOpen').classList.toggle('active', tab==='open');
+  document.getElementById('taskTabMine').classList.toggle('active', tab==='mine');
+  saveState();
+  renderHub();
+}
+
+function computeAverage(){
+  const total = state.spending.reduce((s,x)=>s+x.amount,0);
+  return total / state.spending.length;
+}
+function computeOwedToUser(){
+  const avg = computeAverage();
+  const me = state.spending.find(s=>s.person===USER);
+  if(!me) return 0;
+  return Math.round(me.amount - avg);
+}
+
+function renderFinance(){
+  const avg = computeAverage();
+  const body = document.getElementById('spending-body');
+  body.innerHTML = '';
+  state.spending.forEach(s=>{
+    const diff = Math.round(s.amount - avg);
+    const cls = diff >= 0 ? 'amount-pos' : 'amount-neg';
+    const sign = diff >= 0 ? '+' : '-';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${esc(s.person)}</td><td>$${s.amount}</td><td>$${Math.round(avg)}</td><td class="${cls}">${sign}$${Math.abs(diff)}</td>`;
+    body.appendChild(tr);
+  });
+  const me = state.spending.find(s=>s.person===USER);
+  const note = document.getElementById('spending-note');
+  if(me){
+    const diff = Math.round(me.amount - avg);
+    if(diff < 0){
+      note.textContent = `${USER}, you will pay $${Math.abs(diff)} on your next shared bill`;
+    } else if(diff > 0){
+      note.textContent = `${USER}, you're owed $${diff} back on your next shared bill`;
+    } else {
+      note.textContent = `${USER}, you're all square on shared bills`;
+    }
+  }
+
+  const billsList = document.getElementById('bills-list');
+  billsList.innerHTML = '';
+  state.bills.forEach(b=>{
+    const card = document.createElement('div');
+    card.className = 'bill-card' + (b.collapsed ? ' collapsed' : '');
+    if(b.total){
+      const perPerson = Math.round(b.total / PEOPLE.length);
+      card.innerHTML = `
+        <div class="bill-header" onclick="toggleBill('${b.id}')">
+          <span>${esc(b.name)}: $${b.total} ($${perPerson}pp) due ${esc(b.due)}</span>
+          <span class="chev">&#9660;</span>
+        </div>
+        <div class="bill-body"></div>`;
+      const bodyEl = card.querySelector('.bill-body');
+      b.splits.forEach(sp=>{
+        const row = document.createElement('div');
+        row.className = 'bill-row';
+        const statusCls = sp.status==='Paid' ? 'status-paid' : 'status-unpaid';
+        row.innerHTML = `<span>${esc(sp.person)} ${esc(sp.note)} $${sp.pay}</span><span class="${statusCls}" onclick="event.stopPropagation(); toggleBillStatus('${b.id}','${esc(sp.person)}')">${sp.status}</span>`;
+        bodyEl.appendChild(row);
+      });
+    } else {
+      card.classList.remove('collapsed');
+      card.innerHTML = `<div class="bill-header" style="cursor:default;"><span>${esc(b.name)}: ${esc(b.due)}</span></div>`;
+    }
+    billsList.appendChild(card);
+  });
+}
+
+function toggleBill(id){
+  const b = state.bills.find(x=>x.id===id);
+  if(b){ b.collapsed = !b.collapsed; saveState(); renderFinance(); }
+}
+function toggleBillStatus(billId, person){
+  const b = state.bills.find(x=>x.id===billId);
+  if(!b) return;
+  const sp = b.splits.find(s=>s.person===person);
+  if(sp){ sp.status = sp.status==='Paid' ? 'Unpaid' : 'Paid'; saveState(); renderFinance(); showToast(person+' marked '+sp.status.toLowerCase()); }
+}
+
+function renderConnect(){
+  document.getElementById('chat-day').textContent = state.chat.day;
+  document.getElementById('chat-preview-text').textContent = state.chat.preview;
+
+  const board = document.getElementById('corkboard');
+  board.innerHTML = '';
+  state.posts.forEach(p=>{
+    const div = document.createElement('div');
+    div.className = 'sticky ' + p.color + (p.wide ? ' wide' : '');
+    const bodyHtml = esc(p.body).replace(/\n/g,'<br>');
+    if(p.wide){
+      div.innerHTML = `
+        <div class="pin"></div>
+        ${p.img === 'table' ? '<img src="oooo-03.png" alt="Coffee Table">' : ''}
+        <div>
+          <h4>${esc(p.title)}</h4>
+          <p>${bodyHtml}</p>
+          <div class="meta">${esc(p.author)} ${p.author?'&middot;':''} ${esc(p.time)}</div>
+        </div>`;
+    } else {
+      div.innerHTML = `
+        <div class="pin"></div>
+        <h4>${esc(p.title)}</h4>
+        <p>${bodyHtml}</p>
+        <div class="meta">${p.author ? esc(p.author)+' &middot; '+esc(p.time) : ''}</div>`;
+    }
+    board.appendChild(div);
+  });
+  const footer = document.createElement('div');
+  footer.className = 'corkboard-footer';
+  footer.innerHTML = `<button onclick="openModal('post')">Create New Post +</button>`;
+  board.appendChild(footer);
+}
+
+function esc(s){
+  if(s===undefined||s===null) return '';
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+function openModal(type, payload){
+  const sheet = document.getElementById('modal-sheet');
+  sheet.innerHTML = modalTemplate(type, payload);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function peopleOptions(selected){
+  return PEOPLE.map(p=>`<option value="${p}" ${p===selected?'selected':''}>${p}</option>`).join('');
+}
+
+function modalTemplate(type, payload){
+  switch(type){
+    case 'expense': return `
+      <h3>Add Expense</h3>
+      <div class="field"><label>Description</label><input id="m-desc" placeholder="e.g. Groceries run" /></div>
+      <div class="field"><label>Amount ($)</label><input id="m-amount" type="number" min="0" placeholder="0" /></div>
+      <div class="field"><label>Paid by</label><select id="m-person">${peopleOptions(USER)}</select></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitExpense()">Add Expense</button>
+      </div>`;
+    case 'grocery': return `
+      <h3>Add Grocery Item</h3>
+      <div class="field"><label>Item name</label><input id="m-name" placeholder="e.g. Milk" /></div>
+      <div class="field"><label>Added by</label><select id="m-person">${peopleOptions(USER)}</select></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitGrocery()">Add to Amenities</button>
+      </div>`;
+    case 'chore': return `
+      <h3>Add Chore</h3>
+      <div class="field"><label>Chore</label><input id="m-label" placeholder="e.g. Mop Kitchen" /></div>
+      <div class="field"><label>When</label><input id="m-detail" placeholder="e.g. Tomorrow, 6:00 PM" /></div>
+      <div class="field"><label>Assigned to</label><select id="m-person">${peopleOptions(USER)}</select></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitChore()">Add Chore</button>
+      </div>`;
+    case 'date': return `
+      <h3>Add Date</h3>
+      <div class="field"><label>Event</label><input id="m-label" placeholder="e.g. House Meeting" /></div>
+      <div class="field"><label>Date &amp; time</label><input id="m-detail" placeholder="e.g. Sat, 6:00 PM" /></div>
+      <div class="field"><label>For</label><select id="m-person">${peopleOptions(USER)}</select></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitDate()">Add to Upcoming</button>
+      </div>`;
+    case 'amenity': return `
+      <h3>Add New Amenity</h3>
+      <div class="field"><label>Item name</label><input id="m-name" placeholder="e.g. Sponges" /></div>
+      <div class="field"><label>Starting stock (%)</label><input id="m-stock" type="number" min="0" max="100" value="100" /></div>
+      <div class="field"><label>Restocked by</label><select id="m-person">${peopleOptions(USER)}</select></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitAmenity()">Add Item</button>
+      </div>`;
+    case 'updateLevel': return `
+      <h3>Update Stock Level</h3>
+      <div class="field"><label>Item</label><select id="m-item">${state.amenities.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select></div>
+      <div class="field"><label>New stock level (%)</label><input id="m-stock" type="number" min="0" max="100" value="100" /></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitUpdateLevel()">Update</button>
+      </div>`;
+    case 'assignAmenity': return `
+      <h3>Assign Item To Me</h3>
+      <div class="field"><label>Item</label><select id="m-item">${state.amenities.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select></div>
+      <p style="font-size:13.5px;color:var(--muted);margin:0 0 6px 0;">This marks you as responsible for restocking this item.</p>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitAssignAmenity()">Assign To Me</button>
+      </div>`;
+    case 'task': return `
+      <h3>Add Task</h3>
+      <div class="field"><label>Task</label><input id="m-title" placeholder="e.g. Replace Air Filter" /></div>
+      <div class="field"><label>Priority</label><select id="m-priority"><option>High</option><option selected>Med</option><option>Low</option></select></div>
+      <div class="field"><label>Due</label><input id="m-due" placeholder="e.g. Today or 12 Aug" /></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitTask()">Add Task</button>
+      </div>`;
+    case 'assignTask': return `
+      <h3>Assign Task To Me</h3>
+      <div class="field"><label>Task</label><select id="m-item">${state.tasks.filter(t=>!t.done).map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join('')}</select></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitAssignTask()">Assign To Me</button>
+      </div>`;
+    case 'chat': return `
+      <h3>Home Group Chat</h3>
+      <div style="max-height:220px;overflow-y:auto;margin-bottom:14px;display:flex;flex-direction:column;gap:8px;">
+        ${state.chat.messages.map(m=>`<div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px;"><strong>${esc(m.from)}:</strong> ${esc(m.text)}</div>`).join('')}
+      </div>
+      <div class="field"><label>Message</label><input id="m-msg" placeholder="Type a message..." /></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Close</button>
+        <button class="mini-btn primary" onclick="submitChatMessage()">Send</button>
+      </div>`;
+    case 'post': return `
+      <h3>Create New Post</h3>
+      <div class="field"><label>Title</label><input id="m-title" placeholder="e.g. FREE BOOKSHELF" /></div>
+      <div class="field"><label>Details</label><textarea id="m-body" placeholder="Write your post..."></textarea></div>
+      <div class="field"><label>Note color</label>
+        <div class="color-swatches">
+          <div style="background:var(--blue-note);" class="selected" data-color="blue" onclick="pickColor(this)"></div>
+          <div style="background:var(--pink-note);" data-color="pink" onclick="pickColor(this)"></div>
+          <div style="background:var(--green-note);" data-color="green" onclick="pickColor(this)"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitPost()">Post It</button>
+      </div>`;
+    case 'vacancy': return `
+      <h3>List A Vacancy</h3>
+      <div class="field"><label>Room description</label><input id="m-title" placeholder="e.g. Sunny room, 2nd floor" /></div>
+      <div class="field"><label>Monthly rent ($)</label><input id="m-body" type="number" placeholder="e.g. 950" /></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitVacancy()">Post Listing</button>
+      </div>`;
+    case 'roommate': return `
+      <h3>Find A Roommate</h3>
+      <div class="field"><label>What are you looking for?</label><textarea id="m-body" placeholder="e.g. Clean, quiet roommate, move-in Sept 1"></textarea></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitRoommate()">Post Request</button>
+      </div>`;
+    case 'report': return `
+      <h3>Report A Problem</h3>
+      <div class="field"><label>What's wrong?</label><textarea id="m-body" placeholder="e.g. Leaking pipe under kitchen sink"></textarea></div>
+      <div class="field"><label>Urgency</label><select id="m-priority"><option>Low</option><option selected>Med</option><option>High</option></select></div>
+      <div class="modal-actions">
+        <button class="mini-btn" onclick="closeModal()">Cancel</button>
+        <button class="mini-btn primary" onclick="submitReport()">Submit Report</button>
+      </div>`;
+    default: return '';
+  }
+}
+
+let selectedPostColor = 'blue';
+function pickColor(el){
+  document.querySelectorAll('.color-swatches div').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPostColor = el.dataset.color;
+}
+
+/* ---------- submit handlers ---------- */
+function submitExpense(){
+  const desc = document.getElementById('m-desc').value.trim() || 'Expense';
+  const amount = parseFloat(document.getElementById('m-amount').value) || 0;
+  const person = document.getElementById('m-person').value;
+  const row = state.spending.find(s=>s.person===person);
+  if(row) row.amount += amount;
+  saveState(); renderFinance(); renderHome(); closeModal();
+  showToast(`Added $${amount} expense for ${person}`);
+}
+function submitGrocery(){
+  const name = document.getElementById('m-name').value.trim();
+  const person = document.getElementById('m-person').value;
+  if(!name){ showToast('Please enter an item name'); return; }
+  state.amenities.unshift({id:cid(), name, stock:100, person, date: todayShort()});
+  saveState(); renderHub(); closeModal();
+  showToast(`${name} added to Shared Amenities`);
+}
+function submitChore(){
+  const label = document.getElementById('m-label').value.trim();
+  const detail = document.getElementById('m-detail').value.trim() || 'Upcoming';
+  const person = document.getElementById('m-person').value;
+  if(!label){ showToast('Please enter a chore'); return; }
+  state.chores.push({id:cid(), label, detail, person});
+  saveState(); renderHome(); closeModal();
+  showToast(`Chore "${label}" added`);
+}
+function submitDate(){
+  const label = document.getElementById('m-label').value.trim();
+  const detail = document.getElementById('m-detail').value.trim() || 'TBD';
+  const person = document.getElementById('m-person').value;
+  if(!label){ showToast('Please enter an event name'); return; }
+  state.chores.push({id:cid(), label, detail, person});
+  saveState(); renderHome(); closeModal();
+  showToast(`"${label}" added to Upcoming`);
+}
+function submitAmenity(){
+  const name = document.getElementById('m-name').value.trim();
+  const stock = Math.max(0, Math.min(100, parseInt(document.getElementById('m-stock').value) || 0));
+  const person = document.getElementById('m-person').value;
+  if(!name){ showToast('Please enter an item name'); return; }
+  state.amenities.push({id:cid(), name, stock, person, date: todayShort()});
+  saveState(); renderHub(); closeModal();
+  showToast(`${name} added`);
+}
+function submitUpdateLevel(){
+  const id = document.getElementById('m-item').value;
+  const stock = Math.max(0, Math.min(100, parseInt(document.getElementById('m-stock').value) || 0));
+  const a = state.amenities.find(x=>x.id===id);
+  if(a){ a.stock = stock; a.person = USER; a.date = todayShort(); }
+  saveState(); renderHub(); closeModal();
+  showToast('Stock level updated');
+}
+function submitAssignAmenity(){
+  const id = document.getElementById('m-item').value;
+  const a = state.amenities.find(x=>x.id===id);
+  if(a){ a.person = USER; }
+  saveState(); renderHub(); closeModal();
+  showToast(a ? `${a.name} assigned to you` : 'Assigned');
+}
+function submitTask(){
+  const title = document.getElementById('m-title').value.trim();
+  const priority = document.getElementById('m-priority').value;
+  const due = document.getElementById('m-due').value.trim() || 'TBD';
+  if(!title){ showToast('Please enter a task'); return; }
+  state.tasks.push({id:cid(), title, priority, due, mine:false, done:false});
+  saveState(); renderHub(); closeModal();
+  showToast(`Task "${title}" added`);
+}
+function submitAssignTask(){
+  const id = document.getElementById('m-item').value;
+  const t = state.tasks.find(x=>x.id===id);
+  if(t){ t.mine = true; }
+  saveState(); renderHub(); closeModal();
+  showToast(t ? `"${t.title}" assigned to you` : 'Assigned');
+}
+function submitChatMessage(){
+  const input = document.getElementById('m-msg');
+  const text = input.value.trim();
+  if(!text) return;
+  state.chat.messages.push({from:USER, text});
+  state.chat.preview = text;
+  state.chat.day = "Just now";
+  input.value = '';
+  saveState(); renderConnect();
+  openModal('chat');
+}
+function submitPost(){
+  const title = document.getElementById('m-title').value.trim();
+  const body = document.getElementById('m-body').value.trim();
+  if(!title){ showToast('Please add a title'); return; }
+  state.posts.unshift({id:cid(), color:selectedPostColor, title, body, author:USER, time:'Just now', wide:false, img:null});
+  selectedPostColor = 'blue';
+  saveState(); renderConnect(); closeModal();
+  showToast('Posted to the bulletin board');
+}
+function submitVacancy(){
+  const title = document.getElementById('m-title').value.trim();
+  const rent = document.getElementById('m-body').value.trim();
+  if(!title){ showToast('Please add a description'); return; }
+  state.posts.unshift({id:cid(), color:'blue', title:'ROOM AVAILABLE', body: title + (rent ? ` — $${rent}/mo` : ''), author:USER, time:'Just now', wide:false, img:null});
+  saveState(); renderConnect(); closeModal();
+  showToast('Vacancy listed on the bulletin board');
+}
+function submitRoommate(){
+  const body = document.getElementById('m-body').value.trim();
+  if(!body){ showToast('Please describe what you need'); return; }
+  state.posts.unshift({id:cid(), color:'green', title:'LOOKING FOR ROOMMATE', body, author:USER, time:'Just now', wide:false, img:null});
+  saveState(); renderConnect(); closeModal();
+  showToast('Roommate request posted');
+}
+function submitReport(){
+  const body = document.getElementById('m-body').value.trim();
+  const priority = document.getElementById('m-priority').value;
+  if(!body){ showToast('Please describe the problem'); return; }
+  state.tasks.unshift({id:cid(), title: body.slice(0,40), priority, due:'Today', mine:false, done:false});
+  saveState(); renderHub(); closeModal();
+  showToast('Problem reported and added to To Do List');
+}
+
+function openProfile(){
+  const sheet = document.getElementById('modal-sheet');
+  sheet.innerHTML = `
+    <h3>Profile</h3>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--tan);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;color:var(--brown);font-size:20px;">${USER[0]}</div>
+      <div><strong style="font-size:17px;">${USER}</strong><div style="font-size:13px;color:var(--muted);">Household: You, Leo &amp; Sarah</div></div>
+    </div>
+    <div class="modal-actions"><button class="mini-btn primary" style="width:100%;" onclick="closeModal()">Close</button></div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function openSettings(){
+  const sheet = document.getElementById('modal-sheet');
+  sheet.innerHTML = `
+    <h3>Settings</h3>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Manage your loft preferences.</p>
+    <div class="modal-actions">
+      <button class="mini-btn" style="width:100%;" onclick="resetData()">Reset Demo Data</button>
+    </div>
+    <div class="modal-actions">
+      <button class="mini-btn primary" style="width:100%;" onclick="closeModal()">Close</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function resetData(){
+  state = defaultState();
+  saveState();
+  renderAll();
+  closeModal();
+  showToast('Demo data reset');
+}
+
+function todayShort(){
+  const d = new Date();
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return d.getDate() + ' ' + months[d.getMonth()];
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(async function init(){
+  await loadState();
+  renderAll();
+  goPage('home');
+})();
+</script>
+</body>
+</html>
